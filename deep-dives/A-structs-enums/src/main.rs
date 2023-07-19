@@ -1,3 +1,5 @@
+mod shape;
+
 use std::fmt::Display;
 
 #[derive(Debug)]

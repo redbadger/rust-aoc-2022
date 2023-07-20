@@ -74,8 +74,7 @@ impl Scorer {
 }
 
 fn score_letter_linear_scan(letter: char) -> Option<u8> {
-    let mut alpha = "abcdefghijklmnopqrstuvwxyz".to_string();
-    alpha += &alpha.to_uppercase();
+    let alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     alpha.find(letter).map(|v| v as u8 + 1)
 }
 

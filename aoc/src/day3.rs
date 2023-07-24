@@ -144,6 +144,19 @@ mod tests {
     }
 
     #[test]
+    fn score_lowercase_letter_linear() {
+        let letters = vec!['a', 'b', 'c', 'y', 'z', 'Z'];
+        let scores = vec![1, 2, 3, 25, 26, 52];
+
+        let actual: Vec<_> = letters
+            .iter()
+            .map(|letter| score_letter_linear_scan(*letter).unwrap())
+            .collect();
+
+        assert_eq!(actual, scores);
+    }
+
+    #[test]
     fn score_fast_letter() {
         let scorer = Scorer::new();
 

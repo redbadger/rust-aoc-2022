@@ -172,29 +172,29 @@ mod tests {
     }
 }
 
-#[cfg(test)]
-mod bench {
-    use super::*;
-    use test::{black_box, Bencher};
+// #[cfg(test)]
+// mod bench {
+//     use super::*;
+//     use test::{black_box, Bencher};
 
-    #[bench]
-    fn bench_find_linear(b: &mut Bencher) {
-        b.iter(|| score_letter_linear_scan('A'));
-    }
+//     #[bench]
+//     fn bench_find_linear(b: &mut Bencher) {
+//         b.iter(|| score_letter_linear_scan('A'));
+//     }
 
-    #[bench]
-    fn bench_find_linear_slow(b: &mut Bencher) {
-        b.iter(|| score_letter_linear_scan('Z'));
-    }
+//     #[bench]
+//     fn bench_find_linear_slow(b: &mut Bencher) {
+//         b.iter(|| score_letter_linear_scan('Z'));
+//     }
 
-    #[bench]
-    fn bench_find_lookup(b: &mut Bencher) {
-        let scorer = Scorer::new();
-        b.iter(|| scorer.score_letter('A'));
-    }
+//     #[bench]
+//     fn bench_find_lookup(b: &mut Bencher) {
+//         let scorer = Scorer::new();
+//         b.iter(|| scorer.score_letter('A'));
+//     }
 
-    #[bench]
-    fn bench_find_fast(b: &mut Bencher) {
-        b.iter(|| score_letter_fast('A'));
-    }
-}
+//     #[bench]
+//     fn bench_find_fast(b: &mut Bencher) {
+//         b.iter(|| score_letter_fast('A'));
+//     }
+// }

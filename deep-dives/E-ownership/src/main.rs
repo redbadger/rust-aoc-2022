@@ -1,3 +1,8 @@
+fn main() {
+    bad_borrow();
+    create_o()
+}
+
 #[derive(Clone, Debug)]
 struct MyStruct {
     x: u32,
@@ -91,46 +96,93 @@ fn hold_the_borrow() {
     println!("{hold:?}");
 }
 
-fn main() {
-    bad_borrow();
-    create_o()
-}
-
-struct Node<T> {
-    value: T,
-    child: Option<Box<Node<T>>>,
-}
-
-impl<T> Node<T> {
-    fn push(&mut self, value: T) {
-        if let Some(next) = &mut self.child {
-            next.push(value)
-        } else {
-            self.child = Some(Box::new(Node { value, child: None }));
-        }
-    }
-}
-
 struct SinglyLinkedList<T> {
-    root: Option<Node<T>>,
+    root: Node<T>,
 }
 
 impl<T> SinglyLinkedList<T> {
     fn new() -> Self {
-        Self { root: None }
+        Self { root: Node::Empty }
     }
     fn push(&mut self, value: T) {
-        if let Some(root) = &mut self.root {
-            root.push(value)
-        } else {
-            self.root = Some(Node { value, child: None });
+        self.root.push(value)
+    }
+    fn pop(&mut self) -> Option<T> {
+        self.root.pop()
+    }
+}
+
+enum Node<T> {
+    Empty,
+    Link { value: T, next: Box<Self> },
+}
+
+impl<T> Node<T> {
+    fn push(&mut self, value: T) {
+        match self {
+            Node::Empty => {
+                *self = Node::Link {
+                    value,
+                    next: Box::new(Node::Empty),
+                }
+            }
+            Node::Link { next, .. } => next.push(value),
+        }
+    }
+    fn pop(&mut self) -> Option<T> {
+        match self {
+            Node::Empty => None,
+            Node::Link { next, value } => match **next {
+                Node::Link { .. } => next.pop(),
+                Node::Empty => {
+                    let mut extract = Node::Empty;
+                    std::mem::swap(self, &mut extract);
+                    match extract {
+                        Node::Link { value, .. } => Some(value),
+                        Node::Empty => unreachable!(),
+                    }
+                }
+            },
         }
     }
 }
 
-fn make_linked_list() {
+fn demo_linked_list() {
     let mut ll = SinglyLinkedList::new();
     for x in [1, 2, 3] {
         ll.push(x)
+    }
+}
+
+struct DNode<T> {
+    parent: Box<DNode<T>>,
+    item: DNodeItem<T>,
+}
+
+impl<T> DNode<T> {
+    fn push(&mut self, val: T) {
+        match &mut self.item {
+            DNodeItem::Empty => {}
+            DNodeItem::Link { child, .. } => child.push(val),
+        }
+    }
+}
+
+enum DNodeItem<T> {
+    Empty,
+    Link { value: T, child: Box<DNode<T>> },
+}
+
+struct DoublyLinkedList<T> {
+    front: DNodeItem<T>,
+    back: DNodeItem<T>,
+}
+
+impl<T> DoublyLinkedList<T> {
+    fn new() -> Self {
+        Self {
+            front: DNodeItem::Empty,
+            back: DNodeItem::Empty,
+        }
     }
 }

@@ -1,6 +1,9 @@
+use std::{fs::File, io::Read, rc::Rc};
+
 fn main() {
-    bad_borrow();
-    create_o()
+    // vec_rc();
+    // bad_borrow();
+    create_and_drop_other();
 }
 
 #[derive(Clone, Debug)]
@@ -24,7 +27,7 @@ impl MyStruct {
 
 fn takes_borrow(val: &MyStruct) -> &str {
     // immutable borrow
-    // val.x = 10;  // error
+    // val.x = 10; // error
     &val.y
 }
 
@@ -48,6 +51,7 @@ fn bad_borrow() {
     let mut mine = MyStruct::new();
     takes_borrow(&mine); // pass by immutable reference
     takes_mut(&mut mine); // pass by mutable reference
+
     takes_owned(mine); // pass by move
 
     // takes_borrow(&mine);
@@ -57,11 +61,38 @@ fn bad_borrow() {
 
 fn vec_borrow() {
     let mut v = vec![1, 2, 3, 4];
-    let vref = &v[0];
-    // v.push(5); // error! cannot borrow mutably and immutably
-    // ^^ this would be dangerous, because a vector could reallocate
-    // this would cause vref to dangle, leading to a use-after-free
-    println!("{vref}");
+    let vref = &v[3];
+    v.push(5); // error! cannot borrow mutably and immutably
+               // ^^ this would be dangerous, because a vector could reallocate
+               // this would cause vref to dangle, leading to a use-after-free
+               // println!("{vref}");
+}
+
+fn vec_copy() {
+    let mut v = vec![MyStruct::new()];
+    let vref = v[0].clone();
+    v.push(MyStruct::new()); // error! cannot borrow mutably and immutably
+                             // ^^ this would be dangerous, because a vector could reallocate
+                             // this would cause vref to dangle, leading to a use-after-free
+    println!("{vref:?}");
+}
+
+fn vec_rc() {
+    let my_struct = Rc::new(MyStruct::new());
+    println!("{}", Rc::strong_count(&my_struct));
+
+    let mut v = vec![my_struct];
+
+    let vref = v[0].clone();
+    println!("{}", Rc::strong_count(&vref));
+
+    let vref2 = v[0].clone();
+    println!("{}", Rc::strong_count(&vref));
+
+    v.push(Rc::new(MyStruct::new())); // error! cannot borrow mutably and immutably
+                                      // ^^ this would be dangerous, because a vector could reallocate
+                                      // this would cause vref to dangle, leading to a use-after-free
+                                      // println!("{vref:?}",);
 }
 
 #[derive(Debug)]
@@ -75,12 +106,69 @@ impl Drop for OtherStruct {
     }
 }
 
-fn create_o() {
+fn create_and_drop_other() {
     println!("create o");
     let o = OtherStruct { x: 123 };
+    // take_other_struct_by_move(o);
+    take_other_struct_by_ref(&o);
     println!("leave create o");
     // o is dropped here
 }
+
+fn take_other_struct_by_move(val: OtherStruct) {
+    println!("I got {:?}", val);
+}
+
+fn take_other_struct_by_ref(val: &OtherStruct) {
+    println!("I got {:?}", val);
+}
+
+fn take_one_borrows(s1: &str) -> &str {
+    s1
+}
+
+fn take_two_borrows_no_return(s1: &str, s2: &str) {
+    println!("{s1} {s2}");
+}
+
+fn take_two_borrows_and_returns_first<'a, 'b>(s1: &'a str, s2: &'b str) -> &'a str {
+    println!("{s1} {s2}");
+    s1
+}
+
+fn take_two_borrows_and_returns_second<'a, 'b: 'a>(s1: &'a str, s2: &'b str) -> &'a str {
+    println!("{s1} {s2}");
+    s2
+}
+
+fn take_two_borrows_returns_int(s1: &str, s2: &str) -> u32 {
+    println!("{s1} {s2}");
+    123
+}
+
+fn takes_static(s: &'static str) {
+    println!("{s}");
+}
+
+fn calls_takes_static() {
+    let my_str: &'static str = "Hello world";
+    takes_static(my_str);
+
+    // let new_thing = String::from("Goodbye world");
+    // let new_thing_slice: &str = &new_thing;
+    // takes_static(new_thing_slice); // <- won't work - wrong lifetime
+
+    println!("{my_str}")
+}
+
+// fn take_two_borrows_and_returns_either<'a>(s1: &'a str, s2: &'a str) -> &'a str {
+//     println!("{s1} {s2}");
+//     if rand::random() > 0.5 {
+//         s2
+//     } else {
+//         s1
+//     }
+// }
 
 #[derive(Debug)]
 struct HoldBorrow<'a> {
@@ -88,12 +176,28 @@ struct HoldBorrow<'a> {
 }
 
 fn hold_the_borrow() {
-    let my_struct = MyStruct::new();
+    let mut my_struct = MyStruct::new();
     let hold = HoldBorrow {
         borrowed_struct: &my_struct,
     };
+
     my_struct.say_hello();
+
+    // my_struct.x = 345;
+
     println!("{hold:?}");
+}
+
+fn open_a_file() {
+    let mut file = std::fs::File::open("fake-file.txt").unwrap();
+    let output = read_the_file(file);
+    // let output = read_the_file(file); // <-  Error! file has been moved (and dropped)
+}
+
+fn read_the_file(mut file: File) -> String {
+    let mut buf = String::new();
+    file.read_to_string(&mut buf).unwrap();
+    buf
 }
 
 struct SinglyLinkedList<T> {

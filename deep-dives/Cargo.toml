@@ -1,0 +1,11 @@
+[workspace]
+members = [
+  "A-structs-enums",
+  "B-str-slices",
+  "C-errors-collections",
+  "D-generics-traits",
+  "E-ownership",
+  "F-slices",
+  "G-concurrency",
+  "H-cargo-crates"
+]

@@ -1,0 +1,12 @@
+[package]
+name = "h-cargo-crates"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+
+
+
+[dev-dependencies]
+regex = "1.9.1"

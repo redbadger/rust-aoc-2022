@@ -3,10 +3,9 @@ name = "h-cargo-crates"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
+[features]
+add-numbers = []
+multiply-numbers = []
+manipulate-numbers = ["add-numbers", "multiply-numbers"]
 
-
-
-
-[dev-dependencies]
-regex = "1.9.1"
+default = ["manipulate-numbers"]

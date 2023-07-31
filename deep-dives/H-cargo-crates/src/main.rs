@@ -1,25 +1,29 @@
 fn main() {
-    println!("back!");
+    #[cfg(feature = "add-numbers")]
+    {
+        println!("I am adding numbers!");
+        assert_eq!(add_numbers(1, 2), 3);
+    }
+    #[cfg(feature = "multiply-numbers")]
+    {
+        println!("I am multiplying numbers!");
+        assert_eq!(multiply_numbers(2, 3), 6);
+    }
+
+    let message = hello::message();
+    println!("{message}");
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn regex_test() {
-        let re = regex::Regex::new(
-            r"(?x)
-(?P<year>\d{4})  # the year
--
-(?P<month>\d{2}) # the month
--
-(?P<day>\d{2})   # the day
-",
-        )
-        .unwrap();
+#[cfg(feature = "add-numbers")]
+fn add_numbers(x: i32, y: i32) -> i32 {
+    x + y
+}
 
-        let caps = re.captures("2010-03-14").unwrap();
-        assert_eq!("2010", &caps["year"]);
-        assert_eq!("03", &caps["month"]);
-        assert_eq!("14", &caps["day"]);
-    }
+#[cfg(feature = "multiply-numbers")]
+fn multiply_numbers(x: i32, y: i32) -> i32 {
+    x * y
+}
+
+mod hello {
+    include!(concat!(env!("OUT_DIR"), "/hello.rs"));
 }

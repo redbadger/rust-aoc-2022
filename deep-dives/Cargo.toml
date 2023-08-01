@@ -7,5 +7,6 @@ members = [
   "E-ownership",
   "F-slices",
   "G-concurrency",
-  "H-cargo-crates"
+  "H-cargo-crates",
+  "I-macros"
 ]

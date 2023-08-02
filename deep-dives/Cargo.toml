@@ -8,5 +8,8 @@ members = [
   "F-slices",
   "G-concurrency",
   "H-cargo-crates",
-  "I-macros"
+  "I-macros",
+  "J-closures"
 ]
+
+resolver = "2"

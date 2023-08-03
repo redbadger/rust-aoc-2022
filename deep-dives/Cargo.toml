@@ -9,7 +9,8 @@ members = [
   "G-concurrency",
   "H-cargo-crates",
   "I-macros",
-  "J-closures"
+  "J-closures",
+  "K-async-internals"
 ]
 
 resolver = "2"

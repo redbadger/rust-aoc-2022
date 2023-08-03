@@ -40,6 +40,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "K-async-internals"
+version = "0.1.0"
+dependencies = [
+ "futures",
+]
+
+[[package]]
 name = "a-structs-enums"
 version = "0.1.0"
 
